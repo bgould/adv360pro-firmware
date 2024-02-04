@@ -1,4 +1,6 @@
 github.com/bgould/keyboard-firmware v0.0.0-20240115021013-c11ef9bf0266 h1:1CGmxjRsOHU9nlF+jhi8tZzyxSedn3caxfAHtcjMDpI=
 github.com/bgould/keyboard-firmware v0.0.0-20240115021013-c11ef9bf0266/go.mod h1:+wGkB9oaPwiupwV40rQqzf8/3btnmbivNxg13B+A1N0=
+github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 h1:El6M4kTTCOh6aBiKaUGG7oYTSPP8MxqL4YI3kZKwcP4=
+github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510/go.mod h1:pupxD2MaaD3pAXIBCelhxNneeOaAeabZDe5s4K6zSpQ=
 tinygo.org/x/drivers v0.26.1-0.20231206190939-3fabdc5c9680 h1:S7FwtuTMSkyEjF1cgl3AFlnBR940GYgCMSADm0U8e7o=
 tinygo.org/x/drivers v0.26.1-0.20231206190939-3fabdc5c9680/go.mod h1:q/mU8G/wz821p8xXqbkBACOlmZFDHXd//DnYnCW+dDQ=

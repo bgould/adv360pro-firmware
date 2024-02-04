@@ -6,14 +6,22 @@ import (
 )
 
 func Layer(
-	k00, k10, k20, k30, k40, k50, kC0 /*  */, kC1, k60, k70, k80, k90, kA0, kB0,
-	k01, k11, k21, k31, k41, k51, kD0 /*  */, kD1, k61, k71, k81, k91, kA1, kB1,
-	k02, k12, k22, k32, k42, k52, kE0 /*  */, kE1, k62, k72, k82, k92, kA2, kB2,
-	k03, k13, k23, k33, k43, k53 /*            */, k63, k73, k83, k93, kA3, kB3,
-	kD2, k14, k24, k34, k54 /*                      */, k64, k84, k94, kA4, kE2,
-	/*                    */ k56, k55 /*  */, k96, k85,
-	/*                         */ k35 /*  */, k86,
-	/*               */ k36, k46, k25 /*  */, k66, k75 /**/, k65 keycodes.Keycode,
+	k00, k10, k20, k30, k40, k50, kC0, /*  */
+	k01, k11, k21, k31, k41, k51, kD0, /*  */
+	k02, k12, k22, k32, k42, k52, kE0, /*  */
+	k03, k13, k23, k33, k43, k53,
+	kD2, k14, k24, k34, k54,
+	/*                    */ k56, k55, /*  */
+	/*                         */ k35, /*  */
+	/*               */ k36, k46, k25, /*  */
+	kC1, k60, k70, k80, k90, kA0, kB0,
+	kD1, k61, k71, k81, k91, kA1, kB1,
+	kE1, k62, k72, k82, k92, kA2, kB2,
+	k63, k73, k83, k93, kA3, kB3,
+	k64, k84, k94, kA4, kE2,
+	k96, k85,
+	k86,
+	k66, k75 /**/, k65 keycodes.Keycode,
 ) keyboard.Layer {
 	return keyboard.Layer([][]keycodes.Keycode{
 		/*        0x0  0x1  0x2  0x3  0x4  0x5  0x6  */

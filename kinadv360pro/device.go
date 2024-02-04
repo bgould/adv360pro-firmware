@@ -6,8 +6,6 @@ import (
 	"github.com/bgould/keyboard-firmware/keyboard"
 )
 
-//go:generate go run github.com/bgould/keyboard-firmware/hosts/usbvial/gen-def vial.json
-
 type Device struct {
 }
 

@@ -1,0 +1,4 @@
+{
+	"inherits": ["circuitplay-bluefruit"],
+  "linkerscript": "./kinadv360pro.ld"
+}

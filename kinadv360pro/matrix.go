@@ -3,7 +3,7 @@ package kinadv360pro
 import "github.com/bgould/keyboard-firmware/keyboard"
 
 const (
-	NumRows = 5
+	NumRows = 10
 	NumCols = 10
 )
 

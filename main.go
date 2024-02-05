@@ -13,15 +13,7 @@ import (
 	"github.com/bgould/keyboard-firmware/keyboard"
 )
 
-//go:generate go run github.com/bgould/keyboard-firmware/hosts/usbvial/gen-def vial.json
-
 const _debug = true
-
-func init() {
-	machine.LED = machine.P1_14
-	machine.UART_TX_PIN = machine.P0_14 // PORTB
-	machine.UART_RX_PIN = machine.P0_30 // PORTB
-}
 
 var (
 	keymap = initKeymap()

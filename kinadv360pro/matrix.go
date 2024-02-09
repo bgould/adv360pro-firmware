@@ -11,6 +11,11 @@ const (
 	NumCols = 10
 )
 
+var (
+	WS2812 = machine.P0_20
+	PIXELS = 3
+)
+
 func (dev *Device) NewMatrix() *keyboard.Matrix {
 	return keyboard.NewMatrix(NumRows, NumCols, dev)
 }

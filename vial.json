@@ -1,8 +1,8 @@
 {
   "name": "Kinesis Advantage 360 Pro",
-  "vendorId": "0x239A",
-  "productId": "0x8045",
-  "matrix": {"rows": 20, "cols": 20},
+  "vendorId": "0x23ea",
+  "productId": "0x0362",
+  "matrix": {"rows": 5, "cols": 20},
   "layouts": {
     "keymap": [
       [

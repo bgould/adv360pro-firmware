@@ -16,6 +16,14 @@ func NewDevice(rows []machine.Pin, cols []machine.Pin) *Device {
 // Initialize matrix and peripherals, returning an error if any is unavailable.
 func (m *Device) Initialize() (err error) {
 
+	for _, pin := range RightRows {
+		pin.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
+	}
+
+	for _, pin := range RightCols {
+		pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	}
+
 	// if err = m.configurePins(); err != nil {
 	// 	return err
 	// }
@@ -25,6 +33,16 @@ func (m *Device) Initialize() (err error) {
 
 // ReadRow
 func (m *Device) ReadRow(rowIndex uint8) (row keyboard.Row) {
+
+	for i, pin := range LeftRows {
+		pin.Set(uint8(i) == rowIndex)
+	}
+
+	for i, pin := range LeftCols {
+		if pin.Get() {
+			row |= 1 << i
+		}
+	}
 
 	// // set all row outputs to high except for rowIndex
 	// rows := ^(uint16(1) << rowIndex)

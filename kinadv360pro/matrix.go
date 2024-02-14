@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	NumRows = 10
-	NumCols = 10
+	NumRows = 5
+	NumCols = 20
 )
 
 var (

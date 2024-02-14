@@ -20,8 +20,9 @@ const _debug = true
 
 var (
 	keymap = initKeymap()
-	device = kinadv360pro.NewDevice(kinadv360pro.LeftRows[:], kinadv360pro.LeftCols[:])
-	matrix = keyboard.NewMatrix(kinadv360pro.NumRows, kinadv360pro.NumCols, device)
+	// device = kinadv360pro.NewDevice(kinadv360pro.LeftRows[:], kinadv360pro.LeftCols[:])
+	// device = kinadv360pro.NewDevice(kinadv360pro.RightRows[:], kinadv360pro.RightCols[:])
+	matrix = device.NewMatrix() //keyboard.NewMatrix(kinadv360pro.NumRows, kinadv360pro.NumCols, device)
 )
 
 func init() {

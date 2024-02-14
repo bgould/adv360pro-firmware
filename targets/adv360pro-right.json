@@ -1,0 +1,7 @@
+{
+  "inherits": ["nrf52840-s140v6-uf2-generic"],
+  "build-tags": ["adv360pro", "adv360pro_right"],
+  "linkerscript": "./targets/adv360pro.ld",
+  "serial-port": ["29ea:0362", "239a:00b3"],
+  "msd-volume-name": ["ADV360PRO"]
+}

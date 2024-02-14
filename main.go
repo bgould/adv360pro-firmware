@@ -8,10 +8,10 @@ import (
 	"machine/usb"
 	"time"
 
-	"github.com/bgould/keyboard-firmware/hosts/serial"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
 	"github.com/bgould/keyboard-firmware/keyboard"
+	"github.com/bgould/keyboard-firmware/keyboard/keycodes"
 	"github.com/bgould/kinadv360pro-firmware/kinadv360pro"
 	"tinygo.org/x/drivers/ws2812"
 )
@@ -19,10 +19,19 @@ import (
 const _debug = true
 
 var (
+	cli    = initConsole()
 	keymap = initKeymap()
-	// device = kinadv360pro.NewDevice(kinadv360pro.LeftRows[:], kinadv360pro.LeftCols[:])
-	// device = kinadv360pro.NewDevice(kinadv360pro.RightRows[:], kinadv360pro.RightCols[:])
-	matrix = device.NewMatrix() //keyboard.NewMatrix(kinadv360pro.NumRows, kinadv360pro.NumCols, device)
+	matrix = device.NewMatrix()
+	host   = usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
+	board  = keyboard.New(machine.Serial, host, matrix, keymap)
+
+	scanRate int
+
+	// fn0made bool
+	fn0made time.Time
+	fn1prev uint8
+	fn2prev uint8
+	// fn3made time.Time
 )
 
 func init() {
@@ -31,65 +40,34 @@ func init() {
 	usb.Manufacturer = "Kinesis Corporation"
 	usb.Product = "Adv360 Pro"
 	usb.Serial = vial.MagicSerialNumber("")
+
+	board.SetDebug(_debug)
+	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
+	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
+	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
 }
 
 func main() {
 
-	time.Sleep(2 * time.Second)
-
-	// use the onboard LED as a status indicator
-	// machine.LED.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	// machine.LED.Low()
-
 	// create the keyboard console
-	console := serial.DefaultConsole()
+	// console := serial.DefaultConsole()
 
-	println("initializing")
+	// println("initializing")
 	device.Initialize()
 
-	configureNeo()
-	// configurePins()
+	// configureNeo()
 
-	host := usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
-
-	board := keyboard.New(console, host, matrix, keymap)
-	board.SetDebug(_debug)
-
-	// machine.LED.High()
-
-	var last time.Time
-	for {
-		if time.Since(last) > time.Second {
-			println(last.String())
-			last = time.Now()
+	for last, count := time.Now(), 0; true; count++ {
+		now := time.Now()
+		if d := now.Sub(last); d > time.Second {
+			scanRate = (count * 1000) / int(d/time.Millisecond)
+			count = 0
+			last = now
 		}
 		board.Task()
+		cli.Task()
 	}
 
-}
-
-func configurePins() {
-	// for _, pin := range pins {
-	// 	pin.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
-	// 	println("configured pin", pin, pin.Get())
-	// }
-}
-
-func ReadRow(rowIndex uint8) keyboard.Row {
-	// delay.Sleep(50 * time.Microsecond)
-	// switch rowIndex {
-	// case 0:
-	// 	v := keyboard.Row(0)
-	// 	for i := range pins {
-	// 		if pins[i].Get() {
-	// 			v |= (1 << i)
-	// 		}
-	// 	}
-	// 	return v
-	// default:
-	// 	return 0
-	// }
-	return 0
 }
 
 var leds [3]color.RGBA
@@ -122,4 +100,82 @@ func configureNeo() {
 	// 	led.Set(rg)
 	// 	time.Sleep(100 * time.Millisecond)
 	// }
+}
+
+// func configureKeyAction() keyboard.KeyActionFunc {
+// return func(key keycodes.Keycode, made bool) {
+func keyAction(key keycodes.Keycode, made bool) {
+	switch key {
+
+	// Handle "reset" press
+	case keycodes.QK_BOOT:
+		fallthrough
+	case keycodes.KC_FN0:
+		if made {
+			println("QK_BOOT down")
+			fn0made = time.Now()
+		} else {
+			if time.Since(fn0made) > 2*time.Second {
+				println("entering bootloader")
+				time.Sleep(100 * time.Millisecond)
+				board.EnterBootloader()
+			} else {
+				println("resetting CPU")
+				time.Sleep(100 * time.Millisecond)
+				board.CPUReset()
+			}
+		}
+	// Toggle keypad layer on keypress
+	// case keycodes.KC_FN0:
+	// 	if fn0made && !made {
+	// 		if board.ActiveLayer() == 1 {
+	// 			board.SetActiveLayer(0)
+	// 		} else {
+	// 			board.SetActiveLayer(1)
+	// 		}
+	// 	}
+	// 	fn0made = made
+
+	// Toggle function layer on key down/up
+	case keycodes.KC_FN1:
+		if made {
+			fn1prev = board.ActiveLayer()
+			board.SetActiveLayer(1)
+		} else {
+			board.SetActiveLayer(fn1prev)
+			fn1prev = 0
+		}
+		if fn1prev == 1 {
+			fn1prev = 0
+		}
+
+	// Toggle programming layer on key down/up
+	case keycodes.KC_FN2:
+		if made {
+			fn2prev = board.ActiveLayer()
+			board.SetActiveLayer(2)
+			println("layer 2 on")
+		} else {
+			board.SetActiveLayer(fn2prev)
+			fn2prev = 0
+			println("layer 2 off")
+		}
+		if fn2prev == 2 {
+			fn2prev = 0
+		}
+
+		// Status output
+		// case keycodes.KC_FN3:
+		// 	if !made && time.Since(fn3made) > time.Second {
+		// 		setDisplay(false)
+		// 	} else if made {
+		// 		setDisplay(true)
+		// 		fn3made = time.Now()
+		// 	}
+		// 	if err := showTime(ds, true); err != nil {
+		// 		cli.WriteString("warning: error updating display: " + err.Error())
+		// 	}
+		// }
+
+	}
 }

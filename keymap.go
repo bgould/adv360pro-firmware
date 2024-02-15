@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/bgould/keyboard-firmware/keyboard"
-	"github.com/bgould/kinadv360pro-firmware/kinadv360pro"
+	"github.com/bgould/kinadv360pro-firmware/adv360pro"
 
 	. "github.com/bgould/keyboard-firmware/keyboard/keycodes"
 )
@@ -19,7 +19,7 @@ func initKeymap() keyboard.Keymap {
 	return keyboard.Keymap([]keyboard.Layer{
 
 		// 0 - Default Layer
-		kinadv360pro.Layer(
+		adv360pro.Layer(
 			/************************************************************************/
 			/* */ /* */
 			/* */ KC_EQL_, KC_N1__, KC_N2__, KC_N3__, KC_N4__, KC_N5__, KC_FN2_, /* */
@@ -42,7 +42,7 @@ func initKeymap() keyboard.Keymap {
 			/* ****************************** *\/* ******************************** */
 		),
 		// 1 - Function Layer
-		kinadv360pro.Layer(
+		adv360pro.Layer(
 			/************************************************************************/
 			/* */ /* */
 			/* */ KC_F1__, KC_F2__, KC_F3__, KC_F4__, KC_F5__, KC_F6__, KC_FN2_, /* */
@@ -65,7 +65,7 @@ func initKeymap() keyboard.Keymap {
 			/* ****************************** *\/* ******************************** */
 		),
 		// 2 - Programming Layer
-		kinadv360pro.Layer(
+		adv360pro.Layer(
 			/************************************************************************/
 			/* */ /* */
 			/* */ _______, _______, _______, _______, _______, _______, KC_FN2_, /* */

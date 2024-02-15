@@ -1,4 +1,4 @@
-package kinadv360pro
+package adv360pro
 
 import (
 	"github.com/bgould/keyboard-firmware/keyboard"

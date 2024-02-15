@@ -12,7 +12,7 @@ import (
 	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
 	"github.com/bgould/keyboard-firmware/keyboard"
 	"github.com/bgould/keyboard-firmware/keyboard/keycodes"
-	"github.com/bgould/kinadv360pro-firmware/kinadv360pro"
+	"github.com/bgould/kinadv360pro-firmware/adv360pro"
 	"tinygo.org/x/drivers/ws2812"
 )
 
@@ -75,9 +75,9 @@ var leds [3]color.RGBA
 func configureNeo() {
 	// led.Configure(machine.PinConfig{Mode: machine.PinOutput})
 
-	kinadv360pro.WS2812.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	adv360pro.WS2812.Configure(machine.PinConfig{Mode: machine.PinOutput})
 
-	ws := ws2812.NewWS2812(kinadv360pro.WS2812)
+	ws := ws2812.NewWS2812(adv360pro.WS2812)
 	for i := range leds {
 		leds[i] = color.RGBA{R: 0xff, G: 0xff, B: 0xff}
 	}

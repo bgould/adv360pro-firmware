@@ -2,8 +2,8 @@
 
 package main
 
-import "github.com/bgould/kinadv360pro-firmware/kinadv360pro"
+import "github.com/bgould/kinadv360pro-firmware/adv360pro"
 
 var (
-	device = kinadv360pro.NewDeviceRight()
+	device = adv360pro.NewDeviceRight()
 )

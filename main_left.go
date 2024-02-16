@@ -7,3 +7,7 @@ import "github.com/bgould/kinadv360pro-firmware/adv360pro"
 var (
 	device = adv360pro.NewDeviceLeft()
 )
+
+const (
+	ProductString = "Adv360 Pro (Left)"
+)

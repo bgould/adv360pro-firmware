@@ -16,14 +16,14 @@ type Device struct {
 }
 
 func NewDeviceLeft() *Device {
-	return NewDevice(LeftRows, LeftCols, LeftOffset)
+	return newDevice(LeftRows, LeftCols, LeftOffset)
 }
 
 func NewDeviceRight() *Device {
-	return NewDevice(RightRows, RightCols, RightOffset)
+	return newDevice(RightRows, RightCols, RightOffset)
 }
 
-func NewDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
+func newDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
 	return &Device{rows: rows, cols: cols, offset: offset}
 }
 

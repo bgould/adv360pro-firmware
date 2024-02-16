@@ -24,36 +24,24 @@ var (
 	matrix = device.NewMatrix()
 	host   = usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
 	board  = keyboard.New(machine.Serial, host, matrix, keymap)
-
-	scanRate int
-
-	// fn0made bool
-	fn0made time.Time
-	fn1prev uint8
-	fn2prev uint8
-	// fn3made time.Time
 )
 
 func init() {
 	usb.VendorID = 0x29ea
 	usb.ProductID = 0x0362
 	usb.Manufacturer = "Kinesis Corporation"
-	usb.Product = "Adv360 Pro"
+	usb.Product = ProductString
 	usb.Serial = vial.MagicSerialNumber("")
 
 	board.SetDebug(_debug)
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
 	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
+
+	device.Initialize()
 }
 
 func main() {
-
-	// create the keyboard console
-	// console := serial.DefaultConsole()
-
-	// println("initializing")
-	device.Initialize()
 
 	// configureNeo()
 
@@ -70,37 +58,13 @@ func main() {
 
 }
 
-var leds [3]color.RGBA
+var (
+	scanRate int
 
-func configureNeo() {
-	// led.Configure(machine.PinConfig{Mode: machine.PinOutput})
-
-	adv360pro.WS2812.Configure(machine.PinConfig{Mode: machine.PinOutput})
-
-	ws := ws2812.NewWS2812(adv360pro.WS2812)
-	for i := range leds {
-		leds[i] = color.RGBA{R: 0xff, G: 0xff, B: 0xff}
-	}
-	ws.WriteColors(leds[:])
-	// rg := false
-
-	// for {
-	// 	rg = !rg
-	// 	for i := range leds {
-	// 		rg = !rg
-	// 		if rg {
-	// 			// Alpha channel is not supported by WS2812 so we leave it out
-	// 			leds[i] = color.RGBA{R: 0xff, G: 0x00, B: 0x00}
-	// 		} else {
-	// 			leds[i] = color.RGBA{R: 0x00, G: 0xff, B: 0x00}
-	// 		}
-	// 	}
-
-	// 	ws.WriteColors(leds[:])
-	// 	led.Set(rg)
-	// 	time.Sleep(100 * time.Millisecond)
-	// }
-}
+	fn0made time.Time
+	fn1prev uint8
+	fn2prev uint8
+)
 
 // func configureKeyAction() keyboard.KeyActionFunc {
 // return func(key keycodes.Keycode, made bool) {
@@ -125,6 +89,7 @@ func keyAction(key keycodes.Keycode, made bool) {
 				board.CPUReset()
 			}
 		}
+
 	// Toggle keypad layer on keypress
 	// case keycodes.KC_FN0:
 	// 	if fn0made && !made {
@@ -178,4 +143,36 @@ func keyAction(key keycodes.Keycode, made bool) {
 		// }
 
 	}
+}
+
+var leds [3]color.RGBA
+
+func configureNeo() {
+	// led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
+	adv360pro.WS2812.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
+	ws := ws2812.NewWS2812(adv360pro.WS2812)
+	for i := range leds {
+		leds[i] = color.RGBA{R: 0xff, G: 0xff, B: 0xff}
+	}
+	ws.WriteColors(leds[:])
+	// rg := false
+
+	// for {
+	// 	rg = !rg
+	// 	for i := range leds {
+	// 		rg = !rg
+	// 		if rg {
+	// 			// Alpha channel is not supported by WS2812 so we leave it out
+	// 			leds[i] = color.RGBA{R: 0xff, G: 0x00, B: 0x00}
+	// 		} else {
+	// 			leds[i] = color.RGBA{R: 0x00, G: 0xff, B: 0x00}
+	// 		}
+	// 	}
+
+	// 	ws.WriteColors(leds[:])
+	// 	led.Set(rg)
+	// 	time.Sleep(100 * time.Millisecond)
+	// }
 }

@@ -6,18 +6,24 @@ import (
 	"machine"
 )
 
-var (
-	BATTERY = machine.P0_04
+const (
 	LED     = machine.P0_17
+	BATTERY = machine.P0_04
 	WS2812  = machine.P0_20
 	PIXELS  = 3
+)
 
+var (
+	// LeftCols is a slice of GPIO pins for the left hand device with the matrix columns
 	LeftCols = cols[0 : MatrixCols/2]
 
+	// RightCols is a slice of GPIO pins for the right hand device with the matrix columns
 	RightCols = cols[MatrixCols/2 : MatrixCols]
 
+	// LeftRows is a slice of GPIO pins for the left hand device with the matrix rows
 	LeftRows = rows[0:MatrixRows]
 
+	// RightRows is a slice of GPIO pins for the right hand device with the matrix rows
 	RightRows = rows[MatrixRows : MatrixRows*2]
 )
 

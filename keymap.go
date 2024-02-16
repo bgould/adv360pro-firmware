@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/bgould/adv360pro-firmware/adv360pro"
 	"github.com/bgould/keyboard-firmware/keyboard"
-	"github.com/bgould/kinadv360pro-firmware/adv360pro"
 
 	. "github.com/bgould/keyboard-firmware/keyboard/keycodes"
 )

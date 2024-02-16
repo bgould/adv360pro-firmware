@@ -8,11 +8,11 @@ import (
 	"machine/usb"
 	"time"
 
+	"github.com/bgould/adv360pro-firmware/adv360pro"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
 	"github.com/bgould/keyboard-firmware/keyboard"
 	"github.com/bgould/keyboard-firmware/keyboard/keycodes"
-	"github.com/bgould/kinadv360pro-firmware/adv360pro"
 	"tinygo.org/x/drivers/ws2812"
 )
 

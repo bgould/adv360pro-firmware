@@ -1,4 +1,4 @@
-module github.com/bgould/kinadv360pro-firmware
+module github.com/bgould/adv360pro-firmware
 
 go 1.21.6
 

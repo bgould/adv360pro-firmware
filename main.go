@@ -16,8 +16,6 @@ import (
 	"tinygo.org/x/drivers/ws2812"
 )
 
-const _debug = true
-
 var (
 	cli    = initConsole()
 	keymap = initKeymap()
@@ -33,7 +31,6 @@ func init() {
 	usb.Product = ProductString
 	usb.Serial = vial.MagicSerialNumber("")
 
-	board.SetDebug(_debug)
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
 	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
@@ -54,6 +51,7 @@ func main() {
 		}
 		board.Task()
 		cli.Task()
+		time.Sleep(250 * time.Microsecond)
 	}
 
 }

@@ -1,3 +1,5 @@
+//go:build tinygo
+
 package adv360pro
 
 import (
@@ -14,11 +16,11 @@ type Device struct {
 }
 
 func NewDeviceLeft() *Device {
-	return NewDevice(LeftRows[:], LeftCols[:], 0)
+	return NewDevice(LeftRows, LeftCols, LeftOffset)
 }
 
 func NewDeviceRight() *Device {
-	return NewDevice(RightRows[:], RightCols[:], 10)
+	return NewDevice(RightRows, RightCols, RightOffset)
 }
 
 func NewDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
@@ -27,16 +29,23 @@ func NewDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
 
 // Initialize matrix and peripherals, returning an error if any is unavailable.
 func (m *Device) Initialize() (err error) {
-	println("initializing rows")
 	for _, pin := range m.rows {
 		pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	}
-	println("initializing cols")
 	for _, pin := range m.cols {
 		pin.Configure(machine.PinConfig{Mode: machine.PinInputPullup})
 		// pin.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
 	}
 	return nil
+}
+
+const (
+	MatrixRows = 5
+	MatrixCols = 20
+)
+
+func (dev *Device) NewMatrix() *keyboard.Matrix {
+	return keyboard.NewMatrix(MatrixRows, MatrixCols, dev)
 }
 
 // ReadRow

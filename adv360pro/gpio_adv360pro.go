@@ -1,9 +1,11 @@
-//go:build tinygo && nrf52840
+//go:build tinygo && nrf52840_generic
 
 package adv360pro
 
 import (
 	"machine"
+
+	"github.com/bgould/keyboard-firmware/keyboard"
 )
 
 const (
@@ -11,25 +13,6 @@ const (
 	BATTERY = machine.P0_04
 	WS2812  = machine.P0_20
 	PIXELS  = 3
-)
-
-var (
-	// LeftCols is a slice of GPIO pins for the left hand device with the matrix columns
-	LeftCols = cols[0 : MatrixCols/2]
-
-	// RightCols is a slice of GPIO pins for the right hand device with the matrix columns
-	RightCols = cols[MatrixCols/2 : MatrixCols]
-
-	// LeftRows is a slice of GPIO pins for the left hand device with the matrix rows
-	LeftRows = rows[0:MatrixRows]
-
-	// RightRows is a slice of GPIO pins for the right hand device with the matrix rows
-	RightRows = rows[MatrixRows : MatrixRows*2]
-)
-
-const (
-	LeftOffset  = 0
-	RightOffset = 10
 )
 
 var (
@@ -72,6 +55,22 @@ var (
 		machine.P0_02,
 		machine.P0_28,
 	}
-
-	pwm = machine.PWM0
+	colMode = machine.PinInputPullup
 )
+
+func (m *Device) readRow(rowIndex uint8) (row keyboard.Row) {
+	for i, pin := range m.rows {
+		v := i != int(rowIndex)
+		// v := i == int(rowIndex)
+		pin.Set(v)
+	}
+	delayMicros(5)
+	for i, pin := range m.cols {
+		v := pin.Get()
+		// if v {
+		if !v {
+			row |= (1 << (i + m.offset))
+		}
+	}
+	return row
+}

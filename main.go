@@ -3,17 +3,19 @@
 package main
 
 import (
-	"image/color"
 	"machine"
 	"machine/usb"
 	"time"
 
-	"github.com/bgould/adv360pro-firmware/adv360pro"
+	"github.com/bgould/adv360pro-firmware/adv360pro/ble"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
 	"github.com/bgould/keyboard-firmware/keyboard"
 	"github.com/bgould/keyboard-firmware/keyboard/keycodes"
-	"tinygo.org/x/drivers/ws2812"
+)
+
+const (
+	debug = false
 )
 
 var (
@@ -25,11 +27,11 @@ var (
 )
 
 func init() {
-	usb.VendorID = 0x29ea
-	usb.ProductID = 0x0362
 	usb.Manufacturer = "Kinesis Corporation"
 	usb.Product = ProductString
 	usb.Serial = vial.MagicSerialNumber("")
+
+	ble.Default.Enable()
 
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
@@ -40,7 +42,7 @@ func init() {
 
 func main() {
 
-	// configureNeo()
+	startBLE()
 
 	for last, count := time.Now(), 0; true; count++ {
 		now := time.Now()
@@ -51,7 +53,8 @@ func main() {
 		}
 		board.Task()
 		cli.Task()
-		time.Sleep(250 * time.Microsecond)
+		bleTask()
+		time.Sleep(330 * time.Microsecond)
 	}
 
 }
@@ -88,17 +91,6 @@ func keyAction(key keycodes.Keycode, made bool) {
 			}
 		}
 
-	// Toggle keypad layer on keypress
-	// case keycodes.KC_FN0:
-	// 	if fn0made && !made {
-	// 		if board.ActiveLayer() == 1 {
-	// 			board.SetActiveLayer(0)
-	// 		} else {
-	// 			board.SetActiveLayer(1)
-	// 		}
-	// 	}
-	// 	fn0made = made
-
 	// Toggle function layer on key down/up
 	case keycodes.KC_FN1:
 		if made {
@@ -127,50 +119,16 @@ func keyAction(key keycodes.Keycode, made bool) {
 			fn2prev = 0
 		}
 
-		// Status output
-		// case keycodes.KC_FN3:
-		// 	if !made && time.Since(fn3made) > time.Second {
-		// 		setDisplay(false)
-		// 	} else if made {
-		// 		setDisplay(true)
-		// 		fn3made = time.Now()
+		// Toggle keypad layer on keypress
+		// case keycodes.KC_FN0:
+		// 	if fn0made && !made {
+		// 		if board.ActiveLayer() == 1 {
+		// 			board.SetActiveLayer(0)
+		// 		} else {
+		// 			board.SetActiveLayer(1)
+		// 		}
 		// 	}
-		// 	if err := showTime(ds, true); err != nil {
-		// 		cli.WriteString("warning: error updating display: " + err.Error())
-		// 	}
-		// }
+		// 	fn0made = made}
 
 	}
-}
-
-var leds [3]color.RGBA
-
-func configureNeo() {
-	// led.Configure(machine.PinConfig{Mode: machine.PinOutput})
-
-	adv360pro.WS2812.Configure(machine.PinConfig{Mode: machine.PinOutput})
-
-	ws := ws2812.NewWS2812(adv360pro.WS2812)
-	for i := range leds {
-		leds[i] = color.RGBA{R: 0xff, G: 0xff, B: 0xff}
-	}
-	ws.WriteColors(leds[:])
-	// rg := false
-
-	// for {
-	// 	rg = !rg
-	// 	for i := range leds {
-	// 		rg = !rg
-	// 		if rg {
-	// 			// Alpha channel is not supported by WS2812 so we leave it out
-	// 			leds[i] = color.RGBA{R: 0xff, G: 0x00, B: 0x00}
-	// 		} else {
-	// 			leds[i] = color.RGBA{R: 0x00, G: 0xff, B: 0x00}
-	// 		}
-	// 	}
-
-	// 	ws.WriteColors(leds[:])
-	// 	led.Set(rg)
-	// 	time.Sleep(100 * time.Millisecond)
-	// }
 }

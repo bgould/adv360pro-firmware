@@ -1,0 +1,5 @@
+{
+	"inherits": ["ledglasses-nrf52840"],
+  "build-tags": ["adv360pro_right", "adv360pro_ble_secondary"],
+  "linkerscript": "./targets/adv360pro.ld"
+}

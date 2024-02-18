@@ -9,10 +9,30 @@ import (
 	"github.com/bgould/keyboard-firmware/keyboard"
 )
 
+var (
+	// LeftCols is a slice of GPIO pins for the left hand device with the matrix columns
+	LeftCols = cols[0 : MatrixCols/2]
+
+	// RightCols is a slice of GPIO pins for the right hand device with the matrix columns
+	RightCols = cols[MatrixCols/2 : MatrixCols]
+
+	// LeftRows is a slice of GPIO pins for the left hand device with the matrix rows
+	LeftRows = rows[0:MatrixRows]
+
+	// RightRows is a slice of GPIO pins for the right hand device with the matrix rows
+	RightRows = rows[MatrixRows : MatrixRows*2]
+)
+
+const (
+	LeftOffset  = 0
+	RightOffset = 10
+)
+
 type Device struct {
-	rows   []machine.Pin
-	cols   []machine.Pin
-	offset int
+	rows    []machine.Pin
+	cols    []machine.Pin
+	offset  int
+	overlay [MatrixRows]keyboard.Row
 }
 
 func NewDeviceLeft() *Device {
@@ -30,11 +50,14 @@ func newDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
 // Initialize matrix and peripherals, returning an error if any is unavailable.
 func (m *Device) Initialize() (err error) {
 	for _, pin := range m.rows {
-		pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+		if pin != machine.NoPin {
+			pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+		}
 	}
 	for _, pin := range m.cols {
-		pin.Configure(machine.PinConfig{Mode: machine.PinInputPullup})
-		// pin.Configure(machine.PinConfig{Mode: machine.PinInputPulldown})
+		if pin != machine.NoPin {
+			pin.Configure(machine.PinConfig{Mode: colMode})
+		}
 	}
 	return nil
 }
@@ -48,22 +71,22 @@ func (dev *Device) NewMatrix() *keyboard.Matrix {
 	return keyboard.NewMatrix(MatrixRows, MatrixCols, dev)
 }
 
+func (dev *Device) SetOverlay(overlay [MatrixRows]keyboard.Row) {
+	dev.overlay = overlay
+}
+
 // ReadRow
-func (m *Device) ReadRow(rowIndex uint8) (row keyboard.Row) {
-	for i, pin := range m.rows {
-		v := i != int(rowIndex)
-		// v := i == int(rowIndex)
-		pin.Set(v)
+func (m *Device) ReadRow(rowIndex uint8) keyboard.Row {
+	const (
+		maskLeft = 0b00000000_00000000_00000011_11111111
+		maskRght = 0b00000000_00001111_11111100_00000000
+	)
+	row := m.readRow(rowIndex)
+	if m.offset == RightOffset {
+		return (row & maskRght) | (m.overlay[rowIndex] & maskLeft)
+	} else {
+		return (row & maskLeft) | (m.overlay[rowIndex] & maskRght)
 	}
-	delayMicros(5)
-	for i, pin := range m.cols {
-		v := pin.Get()
-		// if v {
-		if !v {
-			row |= (1 << (i + m.offset))
-		}
-	}
-	return row
 }
 
 func delayMicros(usecs int) {

@@ -1,0 +1,5 @@
+{
+	"inherits": ["circuitplay-bluefruit"],
+  "build-tags": ["adv360pro_left", "adv360pro_ble_primary"],
+  "linkerscript": "./targets/adv360pro.ld"
+}

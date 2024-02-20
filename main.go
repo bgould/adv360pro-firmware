@@ -22,8 +22,9 @@ var (
 	cli    = initConsole()
 	keymap = initKeymap()
 	matrix = device.NewMatrix()
-	host   = usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
-	board  = keyboard.New(machine.Serial, host, matrix, keymap)
+
+	host  keyboard.Host
+	board *keyboard.Keyboard
 )
 
 func init() {
@@ -33,11 +34,15 @@ func init() {
 
 	ble.Default.Enable()
 
+	device.Initialize()
+
+	VialDeviceDefinition.UnlockKeys = unlockKeys
+	host = usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
+
+	board = keyboard.New(machine.Serial, host, matrix, keymap)
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
 	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
-
-	device.Initialize()
 }
 
 func main() {

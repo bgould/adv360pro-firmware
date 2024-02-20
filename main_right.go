@@ -4,12 +4,13 @@ package main
 
 import (
 	"github.com/bgould/adv360pro-firmware/adv360pro"
+	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
 )
 
 var (
 	device = adv360pro.NewDeviceRight()
 
-	bin [20]byte
+	unlockKeys = []vial.Pos{{Row: 0, Col: 19}}
 )
 
 const (

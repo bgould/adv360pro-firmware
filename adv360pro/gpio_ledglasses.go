@@ -9,10 +9,15 @@ import (
 )
 
 const (
-	LED     = machine.LED
-	BATTERY = machine.D20
-	WS2812  = machine.WS2812
-	PIXELS  = 1
+	BACKLIGHT = machine.LED
+	BATTERY   = machine.D20
+	WS2812    = machine.WS2812
+	PIXELS    = 1
+	LED       = BACKLIGHT
+)
+
+var (
+	BACKLIGHT_PWM = machine.PWM0
 )
 
 var (

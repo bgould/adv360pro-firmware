@@ -7,6 +7,7 @@ import (
 	"machine/usb"
 	"time"
 
+	"github.com/bgould/adv360pro-firmware/adv360pro"
 	"github.com/bgould/adv360pro-firmware/adv360pro/ble"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
@@ -25,6 +26,14 @@ var (
 
 	host  keyboard.Host
 	board *keyboard.Keyboard
+
+	backlightDriver = &keyboard.BacklightGPIO{
+		LED: adv360pro.LED,
+		PWM: adv360pro.BACKLIGHT_PWM,
+	}
+	backlightConfig = keyboard.BacklightConfig{
+		Driver: backlightDriver,
+	}
 )
 
 func init() {
@@ -43,9 +52,13 @@ func init() {
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
 	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
+	board.SetBacklightConfig(backlightConfig)
 }
 
 func main() {
+
+	// TODO: probably doesn't belong here
+	backlightDriver.Configure()
 
 	startBLE()
 

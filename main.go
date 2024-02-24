@@ -39,7 +39,7 @@ var (
 func init() {
 	usb.Manufacturer = "Kinesis Corporation"
 	usb.Product = ProductString
-	usb.Serial = vial.MagicSerialNumber("")
+	usb.Serial = vial.MagicSerialNumber(adv360pro.SerialNumber())
 
 	ble.Default.Enable()
 

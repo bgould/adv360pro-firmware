@@ -34,19 +34,20 @@ var (
 	backlightConfig = keyboard.BacklightConfig{
 		Driver: backlightDriver,
 	}
+
+	serialNumber = adv360pro.SerialNumber()
 )
 
 func init() {
-	usb.Manufacturer = "Kinesis Corporation"
-	usb.Product = ProductString
-	usb.Serial = vial.MagicSerialNumber(adv360pro.SerialNumber())
 
 	ble.Default.Enable()
 
-	device.Initialize()
-
 	VialDeviceDefinition.UnlockKeys = unlockKeys
 	host = usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
+
+	usb.Manufacturer = "Kinesis Corporation"
+	usb.Product = ProductString
+	// usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
 	board = keyboard.New(machine.Serial, host, matrix, keymap)
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
@@ -57,8 +58,16 @@ func init() {
 
 func main() {
 
+	// TODO: for some reason this doesn't like being run in init()
+	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
+
 	// TODO: probably doesn't belong here
-	backlightDriver.Configure()
+	components := []interface{}{device, host, backlightDriver}
+	for _, component := range components {
+		if cfg, ok := component.(interface{ Configure() }); ok {
+			cfg.Configure()
+		}
+	}
 
 	startBLE()
 
@@ -114,9 +123,11 @@ func keyAction(key keycodes.Keycode, made bool) {
 		if made {
 			fn1prev = board.ActiveLayer()
 			board.SetActiveLayer(1)
+			println("layer 1 on")
 		} else {
 			board.SetActiveLayer(fn1prev)
 			fn1prev = 0
+			println("layer 1 off")
 		}
 		if fn1prev == 1 {
 			fn1prev = 0

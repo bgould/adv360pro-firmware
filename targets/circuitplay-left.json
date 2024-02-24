@@ -1,5 +1,7 @@
 {
-	"inherits": ["circuitplay-bluefruit"],
-  "build-tags": ["adv360pro_left", "adv360pro_ble_primary"],
-  "linkerscript": "./targets/adv360pro.ld"
+  "inherits": ["nrf52840", "nrf52840-s140v6-uf2"],
+  "build-tags": ["circuitplay_bluefruit", "adv360pro_left", "adv360pro"],
+  "serial-port": ["29ea:0362"],
+  "linkerscript": "./targets/adv360pro.ld",
+  "msd-volume-name": ["CPLAYBTBOOT"]
 }

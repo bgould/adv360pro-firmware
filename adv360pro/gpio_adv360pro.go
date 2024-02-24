@@ -60,6 +60,7 @@ var (
 		machine.P0_02,
 		machine.P0_28,
 	}
+	rowMode = machine.PinOutput
 	colMode = machine.PinInputPullup
 )
 

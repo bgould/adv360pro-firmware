@@ -23,13 +23,13 @@ var (
 var (
 	rows = [MatrixRows * 2]machine.Pin{
 		// left
-		machine.NoPin,
+		machine.SLIDER,
 		machine.NoPin,
 		machine.NoPin,
 		machine.NoPin,
 		machine.NoPin,
 		// right
-		machine.NoPin,
+		machine.SLIDER,
 		machine.NoPin,
 		machine.NoPin,
 		machine.NoPin,
@@ -60,31 +60,38 @@ var (
 		machine.NoPin,
 		machine.NoPin,
 	}
+	rowMode = machine.PinInputPullup
 	colMode = machine.PinInputPulldown
 )
 
-func (m *Device) readRow(rowIndex uint8) keyboard.Row {
+func (m *Device) readRow(rowIndex uint8) (v keyboard.Row) {
 	switch rowIndex {
 	case 0:
-		v := keyboard.Row(0)
-		if rowIndex == 0 {
-			if machine.BUTTONA.Get() {
-				i := 0x0 // left
-				if m.offset == RightOffset {
-					i = 0xF // right
-				}
-				v |= (1 << i)
+		if machine.BUTTONA.Get() {
+			i := 0x7 // left
+			if m.offset == RightOffset {
+				i = 0xB // right
 			}
-			if machine.BUTTONB.Get() {
-				i := 0x1 // left
-				if m.offset == RightOffset {
-					i = 0x10 // right
-				}
-				v |= (1 << i)
-			}
+			v |= (1 << i)
 		}
-		return v
+		if machine.BUTTONB.Get() {
+			i := 0x8 // left
+			if m.offset == RightOffset {
+				i = 0xC // right
+			}
+			v |= (1 << i)
+		}
+		return
+	case 4:
+		if !machine.SLIDER.Get() {
+			i := 0x6 // left
+			if m.offset == RightOffset {
+				i = 0xD // right
+			}
+			v |= (1 << i)
+		}
+		return
 	default:
-		return 0
+		return
 	}
 }

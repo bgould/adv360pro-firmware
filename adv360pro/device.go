@@ -47,11 +47,11 @@ func newDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
 	return &Device{rows: rows, cols: cols, offset: offset}
 }
 
-// Initialize matrix and peripherals, returning an error if any is unavailable.
-func (m *Device) Initialize() (err error) {
+// Configure matrix and peripherals, returning an error if any is unavailable.
+func (m *Device) Configure() {
 	for _, pin := range m.rows {
 		if pin != machine.NoPin {
-			pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+			pin.Configure(machine.PinConfig{Mode: rowMode})
 		}
 	}
 	for _, pin := range m.cols {
@@ -59,7 +59,6 @@ func (m *Device) Initialize() (err error) {
 			pin.Configure(machine.PinConfig{Mode: colMode})
 		}
 	}
-	return nil
 }
 
 const (

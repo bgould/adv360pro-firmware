@@ -3,7 +3,6 @@
 package main
 
 import (
-	"machine"
 	"machine/usb"
 	"time"
 
@@ -27,12 +26,11 @@ var (
 	host  keyboard.Host
 	board *keyboard.Keyboard
 
-	backlightDriver = &keyboard.BacklightGPIO{
-		LED: adv360pro.LED,
-		PWM: adv360pro.BACKLIGHT_PWM,
-	}
-	backlightConfig = keyboard.BacklightConfig{
-		Driver: backlightDriver,
+	backlight = keyboard.Backlight{
+		Driver: &keyboard.BacklightGPIO{
+			LED: adv360pro.LED,
+			PWM: adv360pro.BACKLIGHT_PWM,
+		},
 	}
 
 	serialNumber = adv360pro.SerialNumber()
@@ -49,11 +47,11 @@ func init() {
 	usb.Product = ProductString
 	// usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
-	board = keyboard.New(machine.Serial, host, matrix, keymap)
+	board = keyboard.New(host, matrix, keymap)
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
 	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
-	board.SetBacklightConfig(backlightConfig)
+	board.SetBacklight(backlight)
 }
 
 func main() {
@@ -62,7 +60,7 @@ func main() {
 	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
 	// TODO: probably doesn't belong here
-	components := []interface{}{device, host, backlightDriver}
+	components := []interface{}{device, host, backlight}
 	for _, component := range components {
 		if cfg, ok := component.(interface{ Configure() }); ok {
 			cfg.Configure()
@@ -81,7 +79,7 @@ func main() {
 		board.Task()
 		cli.Task()
 		bleTask()
-		time.Sleep(330 * time.Microsecond)
+		time.Sleep(500 * time.Microsecond)
 	}
 
 }

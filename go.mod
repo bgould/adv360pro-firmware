@@ -3,7 +3,7 @@ module github.com/bgould/adv360pro-firmware
 go 1.21.6
 
 require (
-	github.com/bgould/keyboard-firmware v0.0.0-20240224231647-495d8d8f9c61
+	github.com/bgould/keyboard-firmware v0.0.0-20240225172851-be97b9c047ab
 	tinygo.org/x/bluetooth v0.8.0
 )
 

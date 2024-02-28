@@ -60,7 +60,7 @@ func main() {
 	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
 	// TODO: probably doesn't belong here
-	components := []interface{}{device, host, backlight}
+	components := []interface{}{device, host, backlight, backlight.Driver}
 	for _, component := range components {
 		if cfg, ok := component.(interface{ Configure() }); ok {
 			cfg.Configure()

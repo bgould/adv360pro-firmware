@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/bgould/adv360pro-firmware/adv360pro"
-	"github.com/bgould/adv360pro-firmware/adv360pro/ble"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial"
 	"github.com/bgould/keyboard-firmware/hosts/usbvial/vial"
 	"github.com/bgould/keyboard-firmware/keyboard"
 	"github.com/bgould/keyboard-firmware/keyboard/keycodes"
+	"tinygo.org/x/tinyfs"
 )
 
 const (
@@ -23,7 +23,7 @@ var (
 	keymap = initKeymap()
 	matrix = device.NewMatrix()
 
-	host  keyboard.Host
+	host  *usbvial.Host // keyboard.Host
 	board *keyboard.Keyboard
 
 	backlight = keyboard.Backlight{
@@ -33,12 +33,16 @@ var (
 		},
 	}
 
+	blockdev   tinyfs.BlockDevice
+	filesystem tinyfs.Filesystem
+	fs_mounted bool
+
 	serialNumber = adv360pro.SerialNumber()
 )
 
 func init() {
 
-	ble.Default.Enable()
+	initFilesystem()
 
 	VialDeviceDefinition.UnlockKeys = unlockKeys
 	host = usbvial.NewKeyboard(VialDeviceDefinition, keymap, matrix)
@@ -59,15 +63,21 @@ func main() {
 	// TODO: for some reason this doesn't like being run in init()
 	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
-	// TODO: probably doesn't belong here
-	components := []interface{}{device, host, backlight, backlight.Driver}
-	for _, component := range components {
-		if cfg, ok := component.(interface{ Configure() }); ok {
-			cfg.Configure()
-		}
-	}
+	configureFilesystem()
 
-	startBLE()
+	// TODO: probably doesn't belong here
+	device.Configure()
+	host.Configure()
+	backlight.Driver.Configure()
+
+	// components := []interface{}{device, host, backlight, backlight.Driver}
+	// for _, component := range components {
+	// 	if cfg, ok := component.(interface{ Configure() }); ok {
+	// 		cfg.Configure()
+	// 	}
+	// }
+
+	// startBLE()
 
 	for last, count := time.Now(), 0; true; count++ {
 		now := time.Now()
@@ -78,7 +88,8 @@ func main() {
 		}
 		board.Task()
 		cli.Task()
-		bleTask()
+		// bleTask()
+		// runtime.Gosched()
 		time.Sleep(500 * time.Microsecond)
 	}
 

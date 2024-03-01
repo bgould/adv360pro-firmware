@@ -1,3 +1,5 @@
+//go:build tinygo
+
 package adv360pro
 
 import (

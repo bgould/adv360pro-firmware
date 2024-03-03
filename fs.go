@@ -181,7 +181,7 @@ func rm(cmd console.CommandInfo) int {
 		tgt = strings.TrimSpace(argv[0])
 	}
 	if debug {
-		println("Trying rm to " + tgt)
+		println("Trying to rm ", tgt)
 	}
 	if tgt == "" {
 		println("Usage: rm <target dir>")
@@ -189,7 +189,7 @@ func rm(cmd console.CommandInfo) int {
 	}
 	err := filesystem.Remove(tgt)
 	if err != nil {
-		println("Could not rm " + tgt + ": " + err.Error())
+		println("Could not rm ", tgt, ":", err.Error())
 		return 1
 	}
 	return 0
@@ -390,25 +390,39 @@ func cat(cmd console.CommandInfo) int {
 
 func xxdfprint(w io.Writer, offset uint32, b []byte) {
 	var l int
+	var addr = make([]byte, 16)
+	var data = make([]byte, 48)
 	var buf16 = make([]byte, 16)
-	var padding = ""
 	for i, c := 0, len(b); i < c; i += 16 {
+		a := offset + uint32(i)
+		bin2hex([]byte{byte(a >> 24), byte(a >> 16), byte(a >> 8), byte(a)}, addr)
+		w.Write(addr)
+		w.Write([]byte(": "))
 		l = i + 16
 		if l >= c {
-			padding = strings.Repeat(" ", (l-c)*3)
 			l = c
 		}
-		fmt.Fprintf(w, "%08x: % x    %s", offset+uint32(i), b[i:l], padding)
 		for j, n := 0, l-i; j < 16; j++ {
+			data[j*3] = ' '
+			data[j*3+1] = ' '
+			data[j*3+2] = ' '
 			if j >= n {
 				buf16[j] = ' '
-			} else if !strconv.IsPrint(rune(b[i+j])) {
-				buf16[j] = '.'
 			} else {
-				buf16[j] = b[i+j]
+				var buf [2]byte
+				bin2hex([]byte{byte(b[i+j])}, buf[:])
+				data[j*3+1] = buf[0]
+				data[j*3+2] = buf[1]
+				if !strconv.IsPrint(rune(b[i+j])) {
+					buf16[j] = '.'
+				} else {
+					buf16[j] = b[i+j]
+				}
 			}
 		}
+		w.Write(data)
+		w.Write([]byte("    "))
 		w.Write(buf16)
-		println()
+		w.Write([]byte("\r\n"))
 	}
 }

@@ -7,7 +7,7 @@ MEMORY
   RAM (xrw)       : ORIGIN = 0x20004180, LENGTH = 0x20040000-0x20004180 
 }
 
-_stack_size = 2K;
+_stack_size = 4K;
 
 /* This value is needed by the Nordic SoftDevice. */
 __app_ram_base = ORIGIN(RAM);

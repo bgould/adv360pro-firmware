@@ -42,6 +42,8 @@ var (
 
 func init() {
 
+	// bluetooth.DefaultAdapter.Enable()
+
 	initFilesystem()
 
 	VialDeviceDefinition.UnlockKeys = unlockKeys

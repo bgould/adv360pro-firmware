@@ -10,6 +10,8 @@ github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiU
 github.com/godbus/dbus/v5 v5.0.3/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=
 github.com/godbus/dbus/v5 v5.1.0/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
+github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 h1:El6M4kTTCOh6aBiKaUGG7oYTSPP8MxqL4YI3kZKwcP4=
+github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510/go.mod h1:pupxD2MaaD3pAXIBCelhxNneeOaAeabZDe5s4K6zSpQ=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
@@ -69,5 +71,7 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 tinygo.org/x/bluetooth v0.8.0 h1:WmuRebsODcUUIlGhesyuNRIAEIUCErhKlrZ9K9aimdI=
 tinygo.org/x/bluetooth v0.8.0/go.mod h1:cfsVc0/nGo3nzi6+CeQaXb+anNlmEnSABkKsxer8OAE=
+tinygo.org/x/drivers v0.27.0 h1:TEGk1lQvEhXxfvpEhUu+pwmCnhtldPI+hpHlO9VYixI=
+tinygo.org/x/drivers v0.27.0/go.mod h1:q/mU8G/wz821p8xXqbkBACOlmZFDHXd//DnYnCW+dDQ=
 tinygo.org/x/tinyfs v0.3.0 h1:7GjwuDYOKTJeiCVFT7DfukdFyj/vi0jK4iMZ703AofE=
 tinygo.org/x/tinyfs v0.3.0/go.mod h1:07HkxHkz69kYVrAiLS96RIjuDytVY6tOJ0mH8e5cKa0=

@@ -5,25 +5,12 @@ package main
 import (
 	"fmt"
 	"io"
-	"machine"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/bgould/keyboard-firmware/keyboard/console"
-	"tinygo.org/x/tinyfs/littlefs"
 )
-
-func initFilesystem() {
-	blockdev = machine.Flash
-	lfs := littlefs.New(blockdev)
-	lfs.Configure(&littlefs.Config{
-		CacheSize:     512,
-		LookaheadSize: 512,
-		BlockCycles:   100,
-	})
-	filesystem = lfs
-}
 
 func configureFilesystem() {
 	if err := filesystem.Mount(); err != nil {
@@ -52,6 +39,7 @@ func init() {
 	commands["umount"] = console.CommandHandlerFunc(umount)
 	commands["format"] = console.CommandHandlerFunc(format)
 	commands["ls"] = console.CommandHandlerFunc(ls)
+	commands["mv"] = console.CommandHandlerFunc(mv)
 	commands["mkdir"] = console.CommandHandlerFunc(mkdir)
 	commands["create"] = console.CommandHandlerFunc(create)
 	commands["rm"] = console.CommandHandlerFunc(rm)
@@ -202,6 +190,28 @@ func rm(cmd console.CommandInfo) int {
 	err := filesystem.Remove(tgt)
 	if err != nil {
 		println("Could not rm " + tgt + ": " + err.Error())
+		return 1
+	}
+	return 0
+}
+
+func mv(cmd console.CommandInfo) int {
+	src, dst := "", ""
+	argv := cmd.Argv
+	if len(argv) == 2 {
+		src = strings.TrimSpace(argv[0])
+		dst = strings.TrimSpace(argv[1])
+	}
+	if debug {
+		println("Trying mv from", src, "to", dst)
+	}
+	if src == "" || dst == "" {
+		println("Usage: mv <srcfile> <destfile>")
+		return 1
+	}
+	err := filesystem.Rename(src, dst)
+	if err != nil {
+		println("Could not mv ", src, "to", dst, ":", err.Error())
 		return 1
 	}
 	return 0

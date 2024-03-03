@@ -1,4 +1,4 @@
-//go:build fs.qspi
+//go:build fs.qspi && circuitplay_bluefruit
 
 package main
 

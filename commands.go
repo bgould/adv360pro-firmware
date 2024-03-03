@@ -90,14 +90,3 @@ func load(cmd console.CommandInfo) int {
 		return 0
 	}
 }
-
-func bin2hex(in []byte, out []byte) {
-	const (
-		chars = "0123456789ABCDEF"
-	)
-	for i, b := range in {
-		var n = i * 2
-		out[n+0] = chars[b>>4]
-		out[n+1] = chars[b&15]
-	}
-}

@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -40,12 +39,9 @@ func init() {
 	commands["format"] = console.CommandHandlerFunc(format)
 	commands["ls"] = console.CommandHandlerFunc(ls)
 	commands["mv"] = console.CommandHandlerFunc(mv)
-	commands["mkdir"] = console.CommandHandlerFunc(mkdir)
-	commands["create"] = console.CommandHandlerFunc(create)
 	commands["rm"] = console.CommandHandlerFunc(rm)
 	commands["cat"] = console.CommandHandlerFunc(cat)
-	// "samples": console.CommandHandlerFunc(samples),
-	// "xxd":    console.CommandHandlerFunc(xxd),
+	commands["mkdir"] = console.CommandHandlerFunc(mkdir)
 
 }
 
@@ -217,93 +213,6 @@ func mv(cmd console.CommandInfo) int {
 	return 0
 }
 
-// func samples(cmd console.CommandInfo) int {
-// 	buf := make([]byte, 90)
-// 	for i := 0; i < 5; i++ {
-// 		name := fmt.Sprintf("file%d.txt", i)
-// 		if bytes, err := createSampleFile(name, buf); err != nil {
-// 			fmt.Printf("%s\r\n", err)
-// 			return 1
-// 		} else {
-// 			fmt.Printf("wrote %d bytes to %s\r\n", bytes, name)
-// 		}
-// 	}
-// 	return 0
-// }
-
-func create(cmd console.CommandInfo) int {
-	tgt := ""
-	argv := cmd.Argv
-	if len(argv) == 2 {
-		tgt = strings.TrimSpace(argv[1])
-	}
-	if debug {
-		println("Trying create to " + tgt)
-	}
-	buf := make([]byte, 90)
-	if bytes, err := createSampleFile(tgt, buf); err != nil {
-		fmt.Printf("%s\r\n", err)
-		return 1
-	} else {
-		println("wrote", bytes, "bytes to", tgt)
-		// fmt.Printf("wrote %d bytes to %s\r\n", bytes, tgt)
-		return 0
-	}
-}
-
-// func write(argv []string) {
-// 	tgt := ""
-// 	if len(argv) == 2 {
-// 		tgt = strings.TrimSpace(argv[1])
-// 	}
-// 	if debug {
-// 		println("Trying receive to " + tgt)
-// 	}
-// 	buf := make([]byte, 1)
-// 	f, err := fs.OpenFile(tgt, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
-// 	if err != nil {
-// 		fmt.Printf("error opening %s: %s\r\n", tgt, err.Error())
-// 		return
-// 	}
-// 	defer f.Close()
-// 	var n int
-// 	for {
-// 		if console.Buffered() > 0 {
-// 			data, _ := console.ReadByte()
-// 			switch data {
-// 			case 0x04:
-// 				fmt.Printf("wrote %d bytes to %s\r\n", n, tgt)
-// 				return
-// 			default:
-// 				// anything else, just echo the character if it is printable
-// 				if strconv.IsPrint(rune(data)) {
-// 					console.WriteByte(data)
-// 				}
-// 				buf[0] = data
-// 				if _, err := f.Write(buf); err != nil {
-// 					fmt.Printf("\nerror writing: %s\r\n", err)
-// 					return
-// 				}
-// 				n++
-// 			}
-// 		}
-// 	}
-// }
-
-func createSampleFile(name string, buf []byte) (int, error) {
-	for j := uint8(0); j < uint8(len(buf)); j++ {
-		buf[j] = 0x20 + j
-	}
-	f, err := filesystem.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
-	if err != nil {
-		// return 0, fmt.Errorf("error opening %s: %s", name, err.Error())
-		return 0, err
-	}
-	defer f.Close()
-	bytes, err := f.Write(buf)
-	return bytes, err
-}
-
 func cat(cmd console.CommandInfo) int {
 	tgt := ""
 	argv := cmd.Argv
@@ -346,6 +255,84 @@ func cat(cmd console.CommandInfo) int {
 	return 0
 }
 
+func xxdfprint(w io.Writer, offset uint32, b []byte) {
+	var l int
+	var addr = make([]byte, 16)
+	var data = make([]byte, 48)
+	var buf16 = make([]byte, 16)
+	for i, c := 0, len(b); i < c; i += 16 {
+		a := offset + uint32(i)
+		bin2hex([]byte{byte(a >> 24), byte(a >> 16), byte(a >> 8), byte(a)}, addr)
+		w.Write(addr)
+		w.Write([]byte(": "))
+		l = i + 16
+		if l >= c {
+			l = c
+		}
+		for j, n := 0, l-i; j < 16; j++ {
+			data[j*3] = ' '
+			data[j*3+1] = ' '
+			data[j*3+2] = ' '
+			if j >= n {
+				buf16[j] = ' '
+			} else {
+				var buf [2]byte
+				bin2hex([]byte{byte(b[i+j])}, buf[:])
+				data[j*3+1] = buf[0]
+				data[j*3+2] = buf[1]
+				if !strconv.IsPrint(rune(b[i+j])) {
+					buf16[j] = '.'
+				} else {
+					buf16[j] = b[i+j]
+				}
+			}
+		}
+		w.Write(data)
+		w.Write([]byte("    "))
+		w.Write(buf16)
+		w.Write([]byte("\r\n"))
+	}
+}
+
+// func write(argv []string) {
+// 	tgt := ""
+// 	if len(argv) == 2 {
+// 		tgt = strings.TrimSpace(argv[1])
+// 	}
+// 	if debug {
+// 		println("Trying receive to " + tgt)
+// 	}
+// 	buf := make([]byte, 1)
+// 	f, err := fs.OpenFile(tgt, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
+// 	if err != nil {
+// 		fmt.Printf("error opening %s: %s\r\n", tgt, err.Error())
+// 		return
+// 	}
+// 	defer f.Close()
+// 	var n int
+// 	for {
+// 		if console.Buffered() > 0 {
+// 			data, _ := console.ReadByte()
+// 			switch data {
+// 			case 0x04:
+// 				fmt.Printf("wrote %d bytes to %s\r\n", n, tgt)
+// 				return
+// 			default:
+// 				// anything else, just echo the character if it is printable
+// 				if strconv.IsPrint(rune(data)) {
+// 					console.WriteByte(data)
+// 				}
+// 				buf[0] = data
+// 				if _, err := f.Write(buf); err != nil {
+// 					fmt.Printf("\nerror writing: %s\r\n", err)
+// 					return
+// 				}
+// 				n++
+// 			}
+// 		}
+// 	}
+// }
+
 // func xxd(cmd console.CommandInfo) int {
 // 	var err error
 // 	var addr uint64 = 0x0
@@ -387,42 +374,3 @@ func cat(cmd console.CommandInfo) int {
 // 	xxdfprint(os.Stdout, uint32(addr), buf)
 // 	return 0
 // }
-
-func xxdfprint(w io.Writer, offset uint32, b []byte) {
-	var l int
-	var addr = make([]byte, 16)
-	var data = make([]byte, 48)
-	var buf16 = make([]byte, 16)
-	for i, c := 0, len(b); i < c; i += 16 {
-		a := offset + uint32(i)
-		bin2hex([]byte{byte(a >> 24), byte(a >> 16), byte(a >> 8), byte(a)}, addr)
-		w.Write(addr)
-		w.Write([]byte(": "))
-		l = i + 16
-		if l >= c {
-			l = c
-		}
-		for j, n := 0, l-i; j < 16; j++ {
-			data[j*3] = ' '
-			data[j*3+1] = ' '
-			data[j*3+2] = ' '
-			if j >= n {
-				buf16[j] = ' '
-			} else {
-				var buf [2]byte
-				bin2hex([]byte{byte(b[i+j])}, buf[:])
-				data[j*3+1] = buf[0]
-				data[j*3+2] = buf[1]
-				if !strconv.IsPrint(rune(b[i+j])) {
-					buf16[j] = '.'
-				} else {
-					buf16[j] = b[i+j]
-				}
-			}
-		}
-		w.Write(data)
-		w.Write([]byte("    "))
-		w.Write(buf16)
-		w.Write([]byte("\r\n"))
-	}
-}

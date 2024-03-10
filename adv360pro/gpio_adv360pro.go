@@ -6,6 +6,7 @@ import (
 	"machine"
 
 	"github.com/bgould/keyboard-firmware/keyboard"
+	"tinygo.org/x/drivers/ws2812"
 )
 
 const (
@@ -18,6 +19,8 @@ const (
 
 var (
 	BACKLIGHT_PWM = machine.PWM0
+
+	ws2812_dev = ws2812.NewWS2812(WS2812)
 )
 
 var (

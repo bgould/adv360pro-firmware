@@ -3,6 +3,7 @@
 package main
 
 import (
+	"image/color"
 	"machine/usb"
 	"time"
 
@@ -66,6 +67,13 @@ func main() {
 	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
 	configureFilesystem()
+
+	ind := adv360pro.Indicators{}
+	ind.Configure()
+	ind.Set(adv360pro.LedLeft, color.RGBA{R: 0x0F})
+	ind.Set(adv360pro.LedMiddle, color.RGBA{G: 0x0F})
+	ind.Set(adv360pro.LedRight, color.RGBA{B: 0x0F})
+	ind.Sync()
 
 	// TODO: probably doesn't belong here
 	device.Configure()

@@ -8,11 +8,14 @@ import (
 )
 
 var (
-	device = adv360pro.NewDeviceRight()
-
+	device     = adv360pro.NewDeviceRight()
 	unlockKeys = []vial.Pos{{Row: 0, Col: 19}}
 )
 
 const (
 	ProductString = "Adv360 Pro (Right)"
 )
+
+func init() {
+	device.Indicators.Offset = adv360pro.IndicatorOffsetRight
+}

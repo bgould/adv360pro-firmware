@@ -29,10 +29,11 @@ const (
 )
 
 type Device struct {
-	rows    []machine.Pin
-	cols    []machine.Pin
-	offset  int
-	overlay [MatrixRows]keyboard.Row
+	rows       []machine.Pin
+	cols       []machine.Pin
+	offset     int
+	overlay    [MatrixRows]keyboard.Row
+	Indicators Indicators
 }
 
 func NewDeviceLeft() *Device {
@@ -44,7 +45,19 @@ func NewDeviceRight() *Device {
 }
 
 func newDevice(rows []machine.Pin, cols []machine.Pin, offset int) *Device {
-	return &Device{rows: rows, cols: cols, offset: offset}
+	var indicatorOffset LedPos
+	switch offset {
+	case int(IndicatorOffsetLeft):
+		indicatorOffset = IndicatorOffsetLeft
+	case int(IndicatorOffsetRight):
+		indicatorOffset = IndicatorOffsetRight
+	}
+	return &Device{
+		rows:       rows,
+		cols:       cols,
+		offset:     offset,
+		Indicators: Indicators{Offset: indicatorOffset},
+	}
 }
 
 // Configure matrix and peripherals, returning an error if any is unavailable.
@@ -59,6 +72,7 @@ func (m *Device) Configure() {
 			pin.Configure(machine.PinConfig{Mode: colMode})
 		}
 	}
+	m.Indicators.Configure()
 }
 
 const (

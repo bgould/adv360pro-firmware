@@ -3,7 +3,6 @@
 package main
 
 import (
-	"image/color"
 	"machine/usb"
 	"time"
 
@@ -65,29 +64,20 @@ func main() {
 
 	// TODO: for some reason this doesn't like being run in init()
 	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
+	host.Configure()
 
 	configureFilesystem()
 
-	ind := adv360pro.Indicators{}
-	ind.Configure()
-	ind.Set(adv360pro.LedLeft, color.RGBA{R: 0x0F})
-	ind.Set(adv360pro.LedMiddle, color.RGBA{G: 0x0F})
-	ind.Set(adv360pro.LedRight, color.RGBA{B: 0x0F})
-	ind.Sync()
+	// time.Sleep(2 * time.Second)
+	// println("indicator offset:", device.Indicators.Offset)
 
 	// TODO: probably doesn't belong here
 	device.Configure()
-	host.Configure()
 	backlight.Driver.Configure()
 
-	// components := []interface{}{device, host, backlight, backlight.Driver}
-	// for _, component := range components {
-	// 	if cfg, ok := component.(interface{ Configure() }); ok {
-	// 		cfg.Configure()
-	// 	}
-	// }
-
 	// startBLE()
+
+	var oldState IndicatorState
 
 	for last, count := time.Now(), 0; true; count++ {
 		now := time.Now()
@@ -97,6 +87,7 @@ func main() {
 			last = now
 		}
 		board.Task()
+		oldState = syncIndicators(oldState)
 		cli.Task()
 		// bleTask()
 		// runtime.Gosched()

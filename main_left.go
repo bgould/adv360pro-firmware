@@ -8,14 +8,17 @@ import (
 )
 
 var (
-	device = adv360pro.NewDeviceLeft()
-
+	device     = adv360pro.NewDeviceLeft()
 	unlockKeys = []vial.Pos{{Row: 0, Col: 0}}
 )
 
 const (
 	ProductString = "Adv360 Pro (Left)"
 )
+
+func init() {
+	device.Indicators.Offset = adv360pro.IndicatorOffsetLeft
+}
 
 // func init() {
 // 	board.SetEventReceiver(keyboard.EventReceiverFunc(eventReceiver))

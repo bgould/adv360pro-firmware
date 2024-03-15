@@ -3,6 +3,7 @@
 package main
 
 import (
+	"machine"
 	"machine/usb"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/bgould/keyboard-firmware/keyboard"
 	"github.com/bgould/keyboard-firmware/keyboard/keycodes"
 	"tinygo.org/x/tinyfs"
+	"tinygo.org/x/tinyfs/littlefs"
 )
 
 const (
@@ -19,7 +21,6 @@ const (
 )
 
 var (
-	cli    = initConsole()
 	keymap = initKeymap()
 	matrix = device.NewMatrix()
 
@@ -51,13 +52,24 @@ func init() {
 
 	usb.Manufacturer = "Kinesis Corporation"
 	usb.Product = ProductString
-	// usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 
 	board = keyboard.New(host, matrix, keymap)
+	board.SetFS(filesystem)
 	board.SetKeyAction(keyboard.KeyActionFunc(keyAction))
 	board.SetEnterBootloaderFunc(keyboard.DefaultEnterBootloader)
 	board.SetCPUResetFunc(keyboard.DefaultCPUReset)
 	board.SetBacklight(backlight)
+}
+
+func initFilesystem() {
+	blockdev = machine.Flash
+	lfs := littlefs.New(blockdev)
+	lfs.Configure(&littlefs.Config{
+		CacheSize:     512,
+		LookaheadSize: 512,
+		BlockCycles:   100,
+	})
+	filesystem = lfs
 }
 
 func main() {
@@ -66,7 +78,8 @@ func main() {
 	usb.Serial = vial.MagicSerialNumber(serialNumber.String())
 	host.Configure()
 
-	configureFilesystem()
+	board.EnableConsole(machine.Serial)
+	board.ConfigureFilesystem()
 
 	// time.Sleep(2 * time.Second)
 	// println("indicator offset:", device.Indicators.Offset)
@@ -88,7 +101,6 @@ func main() {
 		}
 		board.Task()
 		oldState = syncIndicators(oldState)
-		cli.Task()
 		// bleTask()
 		// runtime.Gosched()
 		time.Sleep(500 * time.Microsecond)
